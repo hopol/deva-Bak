@@ -53,7 +53,7 @@ export interface StoredSession {
   lastCacheWrite?: number
   /**
    * 绑定的 persona id（对话优先外壳：一对话一身份，单选当值）。
-   * 缺省 = 旧 AppShell 路径（叠加式 enabledPersonas，不做单身份注入）。首发落库后绑定不再改。
+   * 缺省 = 旧版遗留的未绑定对话，执行与显示都按默认角色（见 personas.ts resolvePersonaId）。首发落库后绑定不再改。
    */
   personaId?: string
   /**
@@ -187,7 +187,7 @@ export interface StoredNotice {
   /** kind='error' 时的错误文案。 */
   message?: string
   /** kind='notice' 时的提示码（aborted=用户中止了本轮，其前内容为中止前已产出的部分）。 */
-  code?: 'truncated' | 'empty' | 'refused' | 'restored' | 'aborted'
+  code?: 'truncated' | 'empty' | 'refused' | 'restored' | 'aborted' | 'step_limit' | 'repeated'
 }
 
 /** 会话元信息（左侧列表用，不含正文）。 */
@@ -427,6 +427,28 @@ export function rebindSessionPersona(id: string, from: string, to: string): bool
   s.personaId = to
   save(id)
   return true
+}
+
+/**
+ * 定时任务改了角色 / 模型：同步到它的独占对话（两边以同一个为准，见 tasks.ts updateTask）。对话不存在
+ * （任务从没运行过）则什么都不做。personaId 缺省 = 不动；model 空串 = 跟随全局默认。
+ * 返回是否改动。不动 updatedAt，列表顺序不变。
+ */
+export function syncSessionBinding(id: string, b: { personaId?: string; model: string }): boolean {
+  if (!ensureIndex().has(id)) return false
+  const s = loadSessionFile(id)
+  if (!s) return false
+  let changed = false
+  if (b.personaId && s.personaId !== b.personaId) {
+    s.personaId = b.personaId
+    changed = true
+  }
+  if ((s.model ?? '') !== b.model) {
+    s.model = b.model
+    changed = true
+  }
+  if (changed) save(id)
+  return changed
 }
 
 /** 归档 / 取消归档并落盘，返回是否找到该对话。不动 updatedAt（列表顺序不变）。 */
