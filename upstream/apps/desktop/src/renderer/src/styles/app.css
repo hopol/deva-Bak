@@ -1583,6 +1583,19 @@ button.tl__line:hover {
   white-space: pre-wrap;
   word-break: break-word;
 }
+/* 随插入消息送达的附件：沿用用户气泡的附件区（.cf-sent），在时间轴里改为靠左排，与下面的文字隔开一点 */
+.tl__insert-files {
+  margin: 1px 0 6px;
+}
+.tl__insert-files:last-child {
+  margin-bottom: 0;
+}
+.tl__insert-files .cf-sent {
+  align-items: flex-start;
+}
+.tl__insert-files .cf-sent__row {
+  justify-content: flex-start;
+}
 /* 子智能体展开后的内部步骤：每步一行，带小图标 */
 .tl__sub {
   display: flex;
@@ -3302,10 +3315,6 @@ button.tl__line:hover {
 .msg__mount-body code {
   word-break: break-all;
 }
-.msg__mount-tool {
-  color: var(--fg-muted);
-  font-size: 12px;
-}
 .msg__mount-actions {
   display: flex;
   align-items: center;
@@ -4674,6 +4683,20 @@ button.projmenu__item:disabled {
   align-items: center;
   justify-content: space-between;
   margin-bottom: var(--space-2);
+}
+/* 服务商高级设置页的「自定义请求头」：清单盒与行沿用「模型」一栏的 .model-list / .model-row，行内是 名称 + 值 + 删除 */
+.header-item + .header-item {
+  border-top: 1px solid var(--border);
+}
+.header-item .model-row {
+  border-bottom: none;
+}
+.header-item .header-item__name {
+  flex: 0 0 34%;
+}
+.header-item .field__warn {
+  margin: 0;
+  padding: 0 var(--space-3) var(--space-2);
 }
 .field__hint-link {
   display: inline-flex;

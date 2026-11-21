@@ -298,6 +298,8 @@ IM 机器人支持 `/new [角色名]`、`/list`、`/stop`、`/status`、`/help`�
 
 单条不超过 300 字。偏好记为事实陈述，纠正与踩坑记为「做法 + 原因」。项目记忆保存在本机，不进入项目仓库。
 
+写满后，模型再写入时会先用当前对话的模型自动归纳已有条目：合并同一主题的条目，删除过时或被取代的条目，压缩到容量的七成左右，再写入新条目。归纳前的内容备份在记忆文件同目录的 `memory-backups/` 下，保留最近 5 份；归纳失败时不改动记忆，本次写入被拒绝。在界面中手动添加记忆时，写满则直接提示，不会自动归纳。
+
 ## 安全模型
 
 > \[!WARNING]
@@ -338,6 +340,29 @@ pnpm package:win      # Windows 安装版与便携版
 pnpm package:mac      # macOS
 pnpm package:linux    # Linux
 ```
+
+部署手机版中转（Cloudflare Workers，自建中转或发布官方中转时使用，详见 [apps/relay](apps/relay/README.md)）：
+
+```bash
+pnpm relay:login      # 首次：登录 Cloudflare（在浏览器里确认终端显示的验证码）
+pnpm relay:deploy     # 构建手机网页并部署中转
+pnpm relay:dev        # 本地调试中转（http://127.0.0.1:8787）
+```
+
+也可以把中转部署到自己的 Linux 服务器（Node.js 版，不受 Workers 请求额度限制，详见 [apps/relay-node](apps/relay-node/README.md)）。服务器需要 Node.js 20 及以上与 systemd，一条命令完成构建、上传、安装或升级：
+
+```bash
+pnpm relay-node:deploy root@<服务器地址>   # 经 SSH 部署，配置在服务器的 /etc/deva-relay/relay.env
+```
+
+## 支持项目
+
+Deva 免费开源。如果它对你有帮助，欢迎通过微信赞赏支持，款项用于官方远程服务与域名等运行费用。
+
+<p align="center">
+  <img src="docs/wx.jpg" alt="微信赞赏码" width="260" /><br />
+  <sub>微信扫码赞赏</sub>
+</p>
 
 ## 许可
 

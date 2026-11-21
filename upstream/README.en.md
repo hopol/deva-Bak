@@ -307,6 +307,8 @@ Servers are configured in `~/.deva/mcp.json` using the Claude Desktop `mcpServer
 
 Each entry is at most 300 characters. Preferences are written as statements of fact; corrections and lessons as "what to do + why". Project memory stays on your machine and never enters the repository.
 
+When memory is full, the next write by the model first consolidates the existing entries with the conversation's model: entries on the same topic are merged, outdated or superseded ones are removed, and the total is brought down to about 70% of capacity before the new entry is written. The previous entries are backed up to `memory-backups/` next to the memory file (the last 5 are kept); if consolidation fails, memory is left unchanged and the write is rejected. Adding a memory by hand in the UI still reports that memory is full instead of consolidating.
+
 ## Security Model
 
 > [!WARNING]
@@ -346,6 +348,20 @@ pnpm typecheck        # type check
 pnpm package:win      # Windows installer and portable build
 pnpm package:mac      # macOS
 pnpm package:linux    # Linux
+```
+
+Deploy the phone relay (Cloudflare Workers; for a self-hosted relay or to publish the official one, see [apps/relay](apps/relay/README.md)):
+
+```bash
+pnpm relay:login      # first time: sign in to Cloudflare (confirm the code shown in the terminal)
+pnpm relay:deploy     # build the phone web app and deploy the relay
+pnpm relay:dev        # run the relay locally (http://127.0.0.1:8787)
+```
+
+The relay can also run on your own Linux server (Node.js version, not subject to the Workers request quota; see [apps/relay-node](apps/relay-node/README.md)). The server needs Node.js 20+ and systemd; one command builds, uploads, and installs or upgrades it:
+
+```bash
+pnpm relay-node:deploy root@<server>   # deploys over SSH; settings live in /etc/deva-relay/relay.env on the server
 ```
 
 ```
